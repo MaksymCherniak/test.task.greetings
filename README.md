@@ -1,0 +1,1 @@
+https://travis-ci.org/MaksymCherniak/test.task.greetings.svg?branch=master
