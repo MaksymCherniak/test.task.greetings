@@ -1,18 +1,19 @@
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
 import test.task.locale.service.interfaces.LocaleGreetingService;
-import test.task.locale.tools.AppContext;
+import test.task.locale.service.interfaces.ServiceFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static test.task.locale.tools.AppStaticValues.*;
 
 public class TestLocaleGreetingService {
-    private static ApplicationContext applicationContext;
+    private static ResourceBundle messages;
     private static LocaleGreetingService localeGreetingService;
     private static Locale locale;
 
@@ -21,43 +22,43 @@ public class TestLocaleGreetingService {
 
     @BeforeClass
     public static void init() {
-        applicationContext = AppContext.getApplicationContext();
-        localeGreetingService = (LocaleGreetingService) applicationContext.getBean("LocaleGreetingService");
-        locale = new Locale(EN);
+        locale = Locale.getDefault();
+        messages = ResourceBundle.getBundle(MESSAGES_PATH, locale);
+        localeGreetingService = ServiceFactory.getLocaleGreetingService();
     }
 
     @Test
-    public void morningTimeTest() {
+    public void morningTimeTest() throws UnsupportedEncodingException {
         localTime = LocalTime.of(7, 15);
 
-        expectedMessage = applicationContext.getMessage(MORNING, null, locale);
+        expectedMessage = new String(messages.getString(MORNING).getBytes("ISO-8859-1"), "UTF-8");
 
         assertThat(localeGreetingService.getGreetingMessage(localTime), is(expectedMessage));
     }
 
     @Test
-    public void dayTimeTest() {
+    public void dayTimeTest() throws UnsupportedEncodingException {
         localTime = LocalTime.of(10, 27);
 
-        expectedMessage = applicationContext.getMessage(DAY, null, locale);
+        expectedMessage = new String(messages.getString(DAY).getBytes("ISO-8859-1"), "UTF-8");
 
         assertThat(localeGreetingService.getGreetingMessage(localTime), is(expectedMessage));
     }
 
     @Test
-    public void eveningTimeTest() {
+    public void eveningTimeTest() throws UnsupportedEncodingException {
         localTime = LocalTime.of(19, 0);
 
-        expectedMessage = applicationContext.getMessage(EVENING, null, locale);
+        expectedMessage = new String(messages.getString(EVENING).getBytes("ISO-8859-1"), "UTF-8");
 
         assertThat(localeGreetingService.getGreetingMessage(localTime), is(expectedMessage));
     }
 
     @Test
-    public void nightTimeTest() {
+    public void nightTimeTest() throws UnsupportedEncodingException {
         localTime = LocalTime.of(0, 0);
 
-        expectedMessage = applicationContext.getMessage(NIGHT, null, locale);
+        expectedMessage = new String(messages.getString(NIGHT).getBytes("ISO-8859-1"), "UTF-8");
 
         assertThat(localeGreetingService.getGreetingMessage(localTime), is(expectedMessage));
     }

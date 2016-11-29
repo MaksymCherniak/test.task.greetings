@@ -1,60 +1,41 @@
 package test.task.locale.service.impls;
 
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
 import test.task.locale.service.interfaces.LocaleGreetingService;
-import test.task.locale.tools.AppContext;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static test.task.locale.tools.AppStaticValues.*;
 
 public class LocaleGreetingServiceImpl implements LocaleGreetingService {
     private static Logger log = Logger.getLogger(LocaleGreetingService.class.getName());
 
-    private ApplicationContext applicationContext = AppContext.getApplicationContext();
-
     public String getGreetingMessage(LocalTime localTime) {
         log.info("Get greeting message was called at " + localTime.toString());
+
+        Locale locale = Locale.getDefault();
+        ResourceBundle messages = ResourceBundle.getBundle(MESSAGES_PATH, locale);
+
         int hour = localTime.getHour();
+        String message;
 
-        Locale locale = new Locale(EN);
-        String message = null;
+        if (hour >= 6 && hour < 9) {
+            message = messages.getString(MORNING);
+        } else if (hour >= 9 && hour < 19) {
+            message = messages.getString(DAY);
+        } else if (hour >= 19 && hour < 23) {
+            message = messages.getString(EVENING);
+        } else {
+            message = messages.getString(NIGHT);
+        }
 
-        switch (hour) {
-            case 23:
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                message = applicationContext.getMessage(NIGHT, null, locale);
-                break;
-            case 6:
-            case 7:
-            case 8:
-                message = applicationContext.getMessage(MORNING, null, locale);
-                break;
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-            case 15:
-            case 16:
-            case 17:
-            case 18:
-                message = applicationContext.getMessage(DAY, null, locale);
-                break;
-            case 19:
-            case 20:
-            case 21:
-            case 22:
-                message = applicationContext.getMessage(EVENING, null, locale);
-                break;
+        try {
+            message = new String(message.getBytes("ISO-8859-1"), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
 
         log.info("Returned message: \"" + message + "\"");
